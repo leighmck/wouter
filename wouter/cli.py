@@ -25,6 +25,8 @@ from wouter.router import router
 def main(args=None):
     """Console script for wouter."""
 
+    # TODO(lam) if enabled, start monitor too.
+
     asyncio.get_event_loop().run_until_complete(router.start_router)
     asyncio.get_event_loop().run_forever()
 

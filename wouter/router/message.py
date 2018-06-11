@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 import enum
-from abc import ABC, abstractmethod
+import abc
 
 
 @enum.unique
@@ -43,18 +43,18 @@ class Type(enum.Enum):
     YIELD = 70
 
 
-class Message(ABC):
+class Message(abc.ABC):
     type = ...  # type: Type
 
     def __init__(self, type_: Type):
         self.type = type_
 
     @classmethod
-    @abstractmethod
+    @abc.abstractmethod
     def unmarshal(cls, msg: list):
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def marshal(self) -> list:
         pass
 

@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
+import asyncio
+from typing import Set, Any
+
 import websockets
+from wouter.router import session
 
-
-class Route:
-    pass
-
-
-class Session:
-    pass
 
 
 """
@@ -123,19 +120,31 @@ session
 realm
 basic profile
 advanced profile
-
-
 """
 
 
-async def handler(websocket, path):
-    name = await websocket.recv()
-    print("< {}".format(name))
-
-    greeting = "Hello {}!".format(name)
-
-    await websocket.send(greeting)
-    print("> {}".format(greeting))
+sessions = set()  # type: Set[session.Session]
+connections = set()   # type: Set[websockets.WebSocketServerProtocol]
 
 
-start_router = websockets.serve(handler, 'localhost', 9001)
+async def consumer_handler(websocket, path):
+    """Await message from connected websocket"""
+    session_ = session.Session(websocket)
+    sessions.add(session_)
+
+    while True:
+        message = await websocket.recv()
+        print('consumed message ' + str(message))
+
+
+async def connection_handler(websocket, path):
+    # Register.
+    connections.add(websocket)
+    try:
+        await consumer_handler(websocket, path)
+    finally:
+        # Unregister.
+        connections.remove(websocket)
+
+
+start_router = websockets.serve(connection_handler, 'localhost', 9001)
